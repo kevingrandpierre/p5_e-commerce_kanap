@@ -54,24 +54,38 @@ function pageProduct(product)
     });
 }
 
+// fonction d'écoute au click pour ajouter le produit au panier
 function addToCart(product)
 {
-    const button = document.querySelector("#addToCart")
+  const button = document.querySelector("#addToCart")
     button.addEventListener("click", (event) => {
         const color = document.querySelector("#colors").value
         const quantity = document.querySelector("#quantity").value
-
         if (color == '') {
             alert("Veuillez sélectionner une couleur")
             return
         } else if (quantity == 0) {
             alert("Veuillez sélectionner une quantité")
             return
-        } else if (color == '' || quantity == 0) {
-            alert("Veuillez sélectionner une couleur et un quantité")
-            return
+        } else {
+            //redirection vers le pannier
+            if(confirm("Voulez-vous consulter votre panier ?")) {
+                window.location.href = "cart.html";
+            } else {
+                // si cancel, on reste sur la page
+                return
+            }
         }
+        const product = {
+            id,
+            color,
+            quantity
+        }
+        localStorage.setItem(id, JSON.stringify(product))
     })
 }
 
+
+
 getProducts();
+addToCart();
