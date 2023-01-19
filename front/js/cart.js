@@ -35,6 +35,9 @@ function basketProduct(product, color, quantity) {
   article.classList.add("cart__item");
   article.dataset.id = product;
   article.dataset.color = color;
+  product.colors = color;
+  console.log(color);
+  console.log(product.colors);
   section.appendChild(article);
 
   const divContentImg = document.createElement("div");
@@ -104,12 +107,11 @@ function basketProduct(product, color, quantity) {
 }
 
 // fonction pour modifier la quantité d'un produit du panier
-function modifyQuantity(product, newQuantity) {
-  produitLocalStorage.forEach((item) => {
-    if (item.id === product._id) {
-      item.quantity = newQuantity;
-    }
-  });
+function modifyQuantity(product, newQuantity, color) {
+  const itemToModify = produitLocalStorage.find(
+    (item) => item.id === product._id && item.color === product.colors
+  );
+  itemToModify.quantity = newQuantity;
   localStorage.setItem("cart", JSON.stringify(produitLocalStorage));
   totalItems();
   priceTotal(product);
@@ -125,22 +127,85 @@ function totalItems() {
 
 // fonction pour calculer le prix total du panier
 function priceTotal(product) {
-  const totalPrice = document.querySelector("#totalPrice");
-  totalPrice.innerText = produitLocalStorage.reduce((acc, item) => {
-    return acc + parseInt(item.quantity) * product.price;
-  }, 0);
+  console.log(product.price);
+  console.log(produitLocalStorage);
+  const totalPrice =
+    product.price *
+    produitLocalStorage.reduce((acc, item) => {
+      return acc + parseInt(item.quantity);
+    }, 0);
+  const price = document.querySelector("#totalPrice");
+  price.innerText = totalPrice;
 }
 
 // fonction pour supprimer un produit du panier
 function removeProduct(product, produitLocalStorage) {
-  const itemToRemove = produitLocalStorage.find(
+  console.log(product);
+  const productToRemove = produitLocalStorage.find(
     (item) => item.id === product._id && item.color === product.colors
   );
-  produitLocalStorage.splice(itemToRemove, 1);
+  produitLocalStorage.splice(produitLocalStorage.indexOf(productToRemove), 1);
   localStorage.setItem("cart", JSON.stringify(produitLocalStorage));
   window.location.reload();
 }
+
 // appel des fonctions
 browseLocalStorage();
 totalItems();
 checkCart();
+
+// fonction pour récupérer les données du formulaire
+function getFormData() {
+  const contact = {
+    firstName: document.querySelector("#firstName").value,
+    lastName: document.querySelector("#lastName").value,
+    address: document.querySelector("#address").value,
+    city: document.querySelector("#city").value,
+    email: document.querySelector("#email").value,
+  };
+  return contact;
+}
+
+// fonction pour récupérer les produits du panier
+function getProducts() {
+  const products = produitLocalStorage.map((item) => item.id);
+  return products;
+}
+
+// fonction pour envoyer les données du formulaire et les produits du panier au serveur
+function sendOrder() {
+  const contact = getFormData();
+  const products = getProducts();
+  const data = { contact, products };
+  fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      localStorage.setItem("order", JSON.stringify(data));
+      window.location.href = "confirmation.html";
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
+// fonction pour vérifier si le formulaire est valide
+function checkForm() {
+  const form = document.querySelector("form");
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (form.checkValidity()) {
+      sendOrder();
+    } else {
+      form.reportValidity();
+    }
+  });
+}
+
+// appel de la fonction
+checkForm();
