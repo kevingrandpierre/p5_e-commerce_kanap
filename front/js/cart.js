@@ -168,8 +168,7 @@ function getFormData() {
 
 // fonction pour récupérer les produits du panier
 function getProducts() {
-  const products = produitLocalStorage.map((item) => item.id);
-  return products;
+  return produitLocalStorage.map((item) => item.id);
 }
 
 // fonction pour envoyer les données du formulaire et les produits du panier au serveur
@@ -201,6 +200,7 @@ function checkForm() {
     event.preventDefault();
     if (form.checkValidity()) {
       sendOrder();
+      localStorage.clear();
     } else {
       form.reportValidity();
     }
