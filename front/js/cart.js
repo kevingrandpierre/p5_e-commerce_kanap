@@ -149,6 +149,7 @@ function removeProduct(product, produitLocalStorage) {
   );
   produitLocalStorage.splice(produitLocalStorage.indexOf(itemToRemove), 1);
   localStorage.setItem("cart", JSON.stringify(produitLocalStorage));
+  checkCart();
   updatePage();
 }
 

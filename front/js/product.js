@@ -1,6 +1,5 @@
 let params = new URLSearchParams(document.location.search);
 let id = params.get("id");
-console.log(id);
 
 // fonction fetch pour obtenir les données de l'API
 function getProducts() {
@@ -61,8 +60,8 @@ function addToCart() {
     if (color === "") {
       alert("Veuillez sélectionner une couleur");
       return;
-    } else if (quantity === 0) {
-      alert("Veuillez sélectionner une quantité");
+    } else if (quantity < 1) {
+      alert("Veuillez sélectionner une quantité supérieure à 0");
       return;
     }
     const currentCart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -72,7 +71,6 @@ function addToCart() {
       color: color,
       quantity: Number(quantity),
     };
-    // todo .find by index L.86
     if (currentCart.length === 0) {
       currentCart.push(cart);
       localStorage.setItem("cart", JSON.stringify(currentCart));
@@ -88,11 +86,21 @@ function addToCart() {
         localStorage.setItem("cart", JSON.stringify(currentCart));
       }
     }
+    alert(
+      "Produit ajouté au panier :" +
+        " " +
+        "quatité =" +
+        " " +
+        quantity +
+        " " +
+        ", " +
+        "couleur =" +
+        " " +
+        color
+    );
     window.location.href = "cart.html";
   });
 }
-
-// todo format code
 
 getProducts();
 addToCart();
