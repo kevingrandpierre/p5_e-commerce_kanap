@@ -31,7 +31,6 @@ function updatePage() {
 function checkCart() {
   // contrôle que le panier soit vide
   if (produitLocalStorage.length === 0) {
-    // todo Parcourir le localstorage pour cacher le formulaire
     const form = document.querySelector(".cart");
     form.style.display = "none";
     const title = document.querySelector("h1");
@@ -164,14 +163,13 @@ checkCart();
 
 // fonction pour récupérer les données du formulaire
 function getFormData() {
-  const contact = {
+  return {
     firstName: document.querySelector("#firstName").value,
     lastName: document.querySelector("#lastName").value,
     address: document.querySelector("#address").value,
     city: document.querySelector("#city").value,
     email: document.querySelector("#email").value,
   };
-  return contact;
 }
 
 // fonction pour récupérer les produits du panier
@@ -184,7 +182,6 @@ function sendOrder() {
   const contact = getFormData();
   const products = getProducts();
   const data = { contact, products };
-  console.log(contact, products);
   fetch("http://localhost:3000/api/products/order", {
     method: "POST",
     headers: {
