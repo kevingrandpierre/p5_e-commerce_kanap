@@ -60,8 +60,8 @@ function addToCart() {
     if (color === "") {
       alert("Veuillez sélectionner une couleur");
       return;
-    } else if (quantity < 1) {
-      alert("Veuillez sélectionner une quantité supérieure à 0");
+    } else if (quantity < 1 || quantity > 100) {
+      alert("La quantité doit être comprise entre 1 et 100");
       return;
     }
     const currentCart = JSON.parse(localStorage.getItem("cart")) || [];

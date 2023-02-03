@@ -5,15 +5,15 @@ async function getProductById(id) {
 }
 
 // fonction pour récupérer les données contenues dans le localstorage
-const produitLocalStorage = JSON.parse(localStorage.getItem("cart")) || [];
+const productLocalStorage = JSON.parse(localStorage.getItem("cart")) || [];
 
 function browseLocalStorage() {
-  produitLocalStorage.forEach(async (item) => {
+  productLocalStorage.forEach(async (item) => {
     const product = await getProductById(item.id);
     const totalPrice = product.price;
-    for (const id in produitLocalStorage) {
-      if (produitLocalStorage[id].id === product._id) {
-        produitLocalStorage[id].price = product.price;
+    for (const id in productLocalStorage) {
+      if (productLocalStorage[id].id === product._id) {
+        productLocalStorage[id].price = product.price;
       }
     }
     basketProduct(product, item.color, item.quantity);
@@ -30,7 +30,7 @@ function updatePage() {
 }
 function checkCart() {
   // contrôle que le panier soit vide
-  if (produitLocalStorage.length === 0) {
+  if (productLocalStorage.length === 0) {
     const form = document.querySelector(".cart");
     form.style.display = "none";
     const title = document.querySelector("h1");
@@ -104,7 +104,7 @@ function basketProduct(product, color, quantity) {
   const divSettingsDelete = document.createElement("div");
   divSettingsDelete.classList.add("cart__item__content__settings__delete");
   divSettingsDelete.addEventListener("click", () =>
-    removeProduct(product, produitLocalStorage)
+    removeProduct(product, productLocalStorage)
   );
   divSettings.appendChild(divSettingsDelete);
 
@@ -116,39 +116,55 @@ function basketProduct(product, color, quantity) {
 }
 
 // fonction pour modifier la quantité d'un produit du panier
-function modifyQuantity(product, newQuantity, color) {
-  const itemToModify = produitLocalStorage.find(
+function modifyQuantity(product, newQuantity) {
+  const itemToModify = productLocalStorage.find(
     (item) => item.id === product._id && item.color === product.colors
   );
   itemToModify.quantity = newQuantity;
-  localStorage.setItem("cart", JSON.stringify(produitLocalStorage));
-  totalItems();
-  priceTotal(product);
+  if (newQuantity < 1) {
+    const input = document.querySelector(".itemQuantity");
+    input.value = 1;
+    itemToModify.quantity = 1;
+    localStorage.setItem("cart", JSON.stringify(productLocalStorage));
+    totalItems();
+    priceTotal(product);
+  } else if (newQuantity > 100) {
+    const input = document.querySelector(".itemQuantity");
+    input.value = 100;
+    itemToModify.quantity = 100;
+    localStorage.setItem("cart", JSON.stringify(productLocalStorage));
+    totalItems();
+    priceTotal(product);
+  } else {
+    localStorage.setItem("cart", JSON.stringify(productLocalStorage));
+    totalItems();
+    priceTotal(product);
+  }
 }
 
 // fonction pour calculer la quantité totale du panier
 function totalItems() {
   const totalQuantity = document.querySelector("#totalQuantity");
-  totalQuantity.innerText = produitLocalStorage.reduce((acc, item) => {
+  totalQuantity.innerText = productLocalStorage.reduce((acc, item) => {
     return acc + parseInt(item.quantity);
   }, 0);
 }
 
 // fonction pour calculer le prix total du panier
-function priceTotal(product, color) {
+function priceTotal() {
   const totalPrice = document.querySelector("#totalPrice");
-  totalPrice.innerText = produitLocalStorage.reduce((acc, item) => {
+  totalPrice.innerText = productLocalStorage.reduce((acc, item) => {
     return acc + item.price * item.quantity;
   }, 0);
 }
 
 // fonction pour supprimer un produit du panier
-function removeProduct(product, produitLocalStorage) {
-  const itemToRemove = produitLocalStorage.find(
+function removeProduct(product, productLocalStorage) {
+  const itemToRemove = productLocalStorage.find(
     (item) => item.id === product._id && item.color === product.colors
   );
-  produitLocalStorage.splice(produitLocalStorage.indexOf(itemToRemove), 1);
-  localStorage.setItem("cart", JSON.stringify(produitLocalStorage));
+  productLocalStorage.splice(productLocalStorage.indexOf(itemToRemove), 1);
+  localStorage.setItem("cart", JSON.stringify(productLocalStorage));
   checkCart();
   updatePage();
 }
@@ -175,7 +191,7 @@ function getFormData() {
 
 // fonction pour récupérer les produits du panier
 function getProducts() {
-  return produitLocalStorage.map((item) => item.id);
+  return productLocalStorage.map((item) => item.id);
 }
 
 // fonction pour envoyer les données du formulaire et les produits du panier au serveur
@@ -204,27 +220,42 @@ function sendOrder() {
 function checkForm() {
   const form = document.querySelector("form");
   form.addEventListener("submit", (event) => {
-    const firstName = document.querySelector("#firstName");
-    const lastName = document.querySelector("#lastName");
-    const address = document.querySelector("#address");
-    const city = document.querySelector("#city");
-    const email = document.querySelector("#email");
     const regexName = /^[a-zA-ZÀ-ÿ]+([-'\s][a-zA-ZÀ-ÿ]+)*$/;
     const regexAddress = /^[a-zA-Z0-9À-ÿ\s]+$/;
     const regexEmail = /^[a-zA-Z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/;
-    if (
-      regexName.test(firstName.value) &&
-      regexName.test(lastName.value) &&
-      regexAddress.test(address.value) &&
-      regexName.test(city.value) &&
-      regexEmail.test(email.value)
-    ) {
-      sendOrder();
-      localStorage.clear();
-    } else {
+    const firstName = document.querySelector("#firstName");
+    if (regexName.test(firstName.value) === false) {
       event.preventDefault();
-      alert("Veuillez vérifier vos informations");
+      alert("Veuillez entrer un prénom valide");
+      return;
     }
+    const lastName = document.querySelector("#lastName");
+    if (regexName.test(lastName.value) === false) {
+      event.preventDefault();
+      alert("Veuillez entrer un nom valide");
+      return;
+    }
+    const address = document.querySelector("#address");
+    if (regexAddress.test(address.value) === false) {
+      event.preventDefault();
+      alert("Veuillez entrer une adresse valide");
+      return;
+    }
+    const city = document.querySelector("#city");
+    if (regexName.test(city.value) === false) {
+      event.preventDefault();
+      alert("Veuillez entrer une ville valide");
+      return;
+    }
+    const email = document.querySelector("#email");
+    if (regexEmail.test(email.value) === false) {
+      event.preventDefault();
+      alert("Veuillez entrer une adresse mail valide");
+      return;
+    }
+    sendOrder();
+    window.location.href = "confirmation.html";
+    localStorage.clear();
   });
 }
 

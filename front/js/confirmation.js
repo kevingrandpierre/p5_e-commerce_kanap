@@ -6,5 +6,8 @@ function getIdOfConfirmation() {
   const idOfOrderParsedIdSpan = document.querySelector("#orderId");
   idOfOrderParsedIdSpan.textContent = idOfOrderParsedId;
   localStorage.clear();
+  setTimeout(function () {
+    window.location.href = "index.html";
+  }, 30000);
 }
 getIdOfConfirmation();
