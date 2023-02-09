@@ -98,48 +98,39 @@ function basketProduct(product, color, quantity) {
   input.min = "1";
   input.max = "100";
   input.value = quantity;
-  input.addEventListener("input", () => modifyQuantity(product, input.value));
+  input.addEventListener("change", () => modifyQuantity(product, input.value));
   divSettingsQuantity.appendChild(input);
 
   const divSettingsDelete = document.createElement("div");
   divSettingsDelete.classList.add("cart__item__content__settings__delete");
-  divSettingsDelete.addEventListener("click", () =>
-    removeProduct(product, productLocalStorage)
-  );
   divSettings.appendChild(divSettingsDelete);
 
   const remove = document.createElement("p");
   remove.classList.add("deleteItem");
   remove.type = "button";
   remove.textContent = "Supprimer";
+  remove.addEventListener("click", () =>
+    removeProduct(product, productLocalStorage)
+  );
   divSettingsDelete.appendChild(remove);
 }
 
-// fonction pour modifier la quantité d'un produit du panier
-function modifyQuantity(product, newQuantity) {
-  const itemToModify = productLocalStorage.find(
-    (item) => item.id === product._id && item.color === product.colors
-  );
-  itemToModify.quantity = newQuantity;
-  if (newQuantity < 1) {
-    const input = document.querySelector(".itemQuantity");
-    input.value = 1;
-    itemToModify.quantity = 1;
-    localStorage.setItem("cart", JSON.stringify(productLocalStorage));
-    totalItems();
-    priceTotal(product);
-  } else if (newQuantity > 100) {
-    const input = document.querySelector(".itemQuantity");
-    input.value = 100;
-    itemToModify.quantity = 100;
-    localStorage.setItem("cart", JSON.stringify(productLocalStorage));
-    totalItems();
-    priceTotal(product);
-  } else {
-    localStorage.setItem("cart", JSON.stringify(productLocalStorage));
-    totalItems();
-    priceTotal(product);
+// fonction pour vérifier que la quantité est bien comprise entre 1 et 100
+function modifyQuantity(product, quantity) {
+  if (quantity < 1) {
+    alert("La quantité doit être supérieure à 0");
+    quantity = 1;
+  } else if (quantity > 100) {
+    alert("La quantité doit être inférieure à 100");
+    quantity = 100;
   }
+  for (const id in productLocalStorage) {
+    if (productLocalStorage[id].id === product._id) {
+      productLocalStorage[id].quantity = quantity;
+    }
+  }
+  localStorage.setItem("cart", JSON.stringify(productLocalStorage));
+  updatePage();
 }
 
 // fonction pour calculer la quantité totale du panier
@@ -220,42 +211,36 @@ function sendOrder() {
 function checkForm() {
   const form = document.querySelector("form");
   form.addEventListener("submit", (event) => {
+    event.preventDefault();
     const regexName = /^[a-zA-ZÀ-ÿ]+([-'\s][a-zA-ZÀ-ÿ]+)*$/;
     const regexAddress = /^[a-zA-Z0-9À-ÿ\s]+$/;
     const regexEmail = /^[a-zA-Z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/;
     const firstName = document.querySelector("#firstName");
     if (regexName.test(firstName.value) === false) {
-      event.preventDefault();
       alert("Veuillez entrer un prénom valide");
       return;
     }
     const lastName = document.querySelector("#lastName");
     if (regexName.test(lastName.value) === false) {
-      event.preventDefault();
       alert("Veuillez entrer un nom valide");
       return;
     }
     const address = document.querySelector("#address");
     if (regexAddress.test(address.value) === false) {
-      event.preventDefault();
       alert("Veuillez entrer une adresse valide");
       return;
     }
     const city = document.querySelector("#city");
     if (regexName.test(city.value) === false) {
-      event.preventDefault();
       alert("Veuillez entrer une ville valide");
       return;
     }
     const email = document.querySelector("#email");
     if (regexEmail.test(email.value) === false) {
-      event.preventDefault();
       alert("Veuillez entrer une adresse mail valide");
       return;
     }
     sendOrder();
-    window.location.href = "confirmation.html";
-    localStorage.clear();
   });
 }
 

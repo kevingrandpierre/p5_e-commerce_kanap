@@ -7,7 +7,7 @@ function getProducts() {
       }
     })
     .then(function (data) {
-      product(data);
+      products(data);
     })
     // Catch error
     .catch(function (err) {
@@ -16,7 +16,7 @@ function getProducts() {
 }
 
 //function pour créer le DOM en faisant une boucle qui parcourt tous les objets du JSON
-function product(data) {
+function products(data) {
   let items = document.getElementById("items");
   for (let i in data) {
     // créer une balise a.href

@@ -2,45 +2,45 @@ let params = new URLSearchParams(document.location.search);
 let id = params.get("id");
 
 // fonction fetch pour obtenir les données de l'API
-function getProducts() {
+function getProduct() {
   fetch("http://localhost:3000/api/products/" + id)
-    .then(function (res) {
+    .then((res) => {
       if (res.ok) {
         return res.json();
       }
     })
-    .then((res) => {
-      return pageProduct(res);
+    .then((data) => {
+      return pageProduct(data);
     })
     .catch((error) => console.log(error));
 }
 
 // fonction pour créer les éléments du DOM
-function pageProduct(product) {
+function pageProduct(data) {
   const itemImg = document.querySelector(".item__img");
 
   // créer une image
   const img = document.createElement("img");
+  img.src = data.imageUrl;
+  img.alt = data.altTxt;
   itemImg.appendChild(img);
-  img.src = product.imageUrl;
-  img.alt = product.altTxt;
 
   // afficher le titre
   const title = document.querySelector("#title");
-  title.textContent = product.name;
+  title.textContent = data.name;
 
   // afficher le prix
-  const prix = product.price;
+  const prix = data.price;
   const priceProduct = document.querySelector("#price");
   priceProduct.textContent = prix;
 
   // afficher la description
-  const description = product.description;
+  const description = data.description;
   const p = document.querySelector("#description");
   p.textContent = description;
 
   // afficher les couleurs dans la liste déroulante
-  const color = product.colors;
+  const color = data.colors;
   const colorSelect = document.querySelector("#colors");
   color.forEach((color) => {
     const option = document.createElement("option");
@@ -76,7 +76,7 @@ function addToCart() {
       localStorage.setItem("cart", JSON.stringify(currentCart));
     } else {
       const findProduct = currentCart.find(
-        (product) => product.id === id && product.color === color
+        (data) => data.id === id && data.color === color
       );
       if (findProduct) {
         findProduct.quantity += Number(quantity);
@@ -102,5 +102,5 @@ function addToCart() {
   });
 }
 
-getProducts();
+getProduct();
 addToCart();
