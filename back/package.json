@@ -11,5 +11,8 @@
   "dependencies": {
     "express": "^4.16.4",
     "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "cypress": "^13.9.0"
   }
 }
